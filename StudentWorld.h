@@ -30,7 +30,7 @@ public:
     bool getContent();
     
     void textDisplay();
-    void removeDirt(int a, int b,Actor::Direction dir);
+    void removeDirt(int a, int b);
     
 private:
     std::vector<Actor*> m_actor;

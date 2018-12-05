@@ -53,7 +53,7 @@ void TunnelMan::doSomething()
                     setDirection(up);
                     moveTo( getX(),getY() +1);
                     
-                  //  getWorld() -> removeDirt(getX(),getY(),getDirection());
+                    getWorld() -> removeDirt(getX(),getY());
                     
 
                 }
@@ -64,7 +64,7 @@ void TunnelMan::doSomething()
                     setDirection(down);
                     moveTo(getX(), getY()-1);
 
-                   getWorld() -> removeDirt(getX(),getY(),getDirection());
+                   getWorld() -> removeDirt(getX(),getY());
                     
 
                 }
@@ -74,7 +74,7 @@ void TunnelMan::doSomething()
                 {
                     setDirection(left);
                     moveTo(getX()-1, getY());
-                    getWorld() -> removeDirt(getX(),getY(),getDirection());
+                    getWorld() -> removeDirt(getX(),getY());
 
                 }
                 break;
@@ -83,7 +83,7 @@ void TunnelMan::doSomething()
                 {
                     setDirection(right);
                     moveTo(getX()+1, getY());
-                    //getWorld() -> removeDirt(getX(),getY(),getDirection());
+                    getWorld() -> removeDirt(getX(),getY());
                     
                 }
                 break;

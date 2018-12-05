@@ -28,7 +28,7 @@ int StudentWorld::init()
             //Shaft
             if ((i >= 30 && i <= 33) && (j >= 4 && j <= 59))
             {
-
+                m_field[i][j] = nullptr;
             }
             else {
                 m_field[i][j] = new Earth(i, j,this);
@@ -82,31 +82,35 @@ int StudentWorld::move()
     StudentWorld::textDisplay();
     m_tunnelman->doSomething();
     
-    vector<Actor*>::iterator i;
+    
     //Each actor moves.
-    for (i = m_actor.begin(); i != m_actor.end(); i++)
+    
+    if (!m_actor.empty())
     {
-        if ((*i)->isAlive())
+        vector<Actor*>::iterator i;
+        
+        
+        for (i = m_actor.begin(); i != m_actor.end(); i++)
         {
-            (*i)->doSomething();
-            //If FrackMan dies
-            if (!m_tunnelman->isAlive())
+            if ((*i)->isAlive())
             {
-                decLives();
-                return GWSTATUS_PLAYER_DIED;
+                (*i)->doSomething();
+                //If FrackMan dies
             }
         }
-    }
-    //Remove dead objects
-    for (i = m_actor.begin(); i != m_actor.end();)
-    {
-        if (!(*i)->isAlive())
+        
+        //Remove dead objects
+        for (i = m_actor.begin(); i != m_actor.end();)
         {
-            delete *i;
-            i = m_actor.erase(i);
+            if (!(*i)->isAlive())
+            {
+                delete *i;
+                i = m_actor.erase(i);
+            }
+            else i++;
         }
-        else i++;
     }
+        
     if (!m_tunnelman->isAlive())
     {
         decLives();
@@ -124,36 +128,18 @@ bool StudentWorld:: getContent()
     return false;
     
 }
-void StudentWorld:: removeDirt(int x , int y, Actor::Direction dir)
+void StudentWorld:: removeDirt(int x , int y)
 {
-    //ERROR WHEN TRYING TO DIG EARTH THROUGH SHAFT FIX 
-    switch( dir)
-    {
-        case Actor::right:
-           m_field[x+3][y]->setVisible(false);
-            m_field[x+3][y+1]->setVisible(false);
-            m_field[x+3][y+2]->setVisible(false);
-            m_field[x+3][y+3]->setVisible(false);
-            break;
-        case Actor::left:
-            m_field[x][y]->setVisible(false);
-            m_field[x][y+1]->setVisible(false);
-            m_field[x][y+2]->setVisible(false);
-            m_field[x][y+3]->setVisible(false);
-            break;
     
-        case Actor::up:
-            m_field[x][y+3]->setVisible(false);
-            m_field[x+1][y+3]->setVisible(false);
-            m_field[x+2][y+3]->setVisible(false);
-            m_field[x+3][y+3]->setVisible(false);
-            break;
-        case Actor::down:
-            m_field[x][y]->setVisible(false);
-            m_field[x+1][y]->setVisible(false);
-            m_field[x+2][y]->setVisible(false);
-            m_field[x+3][y]->setVisible(false);
-    break;
+    for ( int i=x ;i<x+4 ;i++)
+    {
+        for ( int j=y ;j<y+4 ;j++)
+        {
+            if ( m_field[i][j] != nullptr)
+            {
+                delete m_field[i][j];
+                m_field[i][j]= nullptr;
+            }
+        }
     }
-
 }
