@@ -28,24 +28,14 @@ int StudentWorld::init()
             //Shaft
             if ((i >= 30 && i <= 33) && (j >= 4 && j <= 59))
             {
-                m_field[i][j] = nullptr;
+                
             }
             else {
                 m_field[i][j] = new Earth(i, j,this);
                 grid[i][j] = 1;
             }
         }
-        
     }
-//    for ( int j = 0 ; j < 64; j++)
-//    {
-//        for ( int i=30; i <34 ; i++)
-//        {
-//            m_field[i][j] -> setVisible(false);
-//        }
-//    }
-    
-    
     
     return GWSTATUS_CONTINUE_GAME;
 }
@@ -82,9 +72,6 @@ int StudentWorld::move()
     StudentWorld::textDisplay();
     m_tunnelman->doSomething();
     
-    
-    //Each actor moves.
-    
     if (!m_actor.empty())
     {
         vector<Actor*>::iterator i;
@@ -95,7 +82,7 @@ int StudentWorld::move()
             if ((*i)->isAlive())
             {
                 (*i)->doSomething();
-                //If FrackMan dies
+                //If tunnelman dies
             }
         }
         
@@ -110,7 +97,7 @@ int StudentWorld::move()
             else i++;
         }
     }
-        
+    
     if (!m_tunnelman->isAlive())
     {
         decLives();
@@ -118,28 +105,114 @@ int StudentWorld::move()
     }
     return GWSTATUS_CONTINUE_GAME;
 }
-
-bool StudentWorld:: getContent()
+int StudentWorld::getContentsOf(int x, int y)
 {
-    //if ( )
-    
-    
-    
-    return false;
-    
+    return grid[x][y];
 }
-void StudentWorld:: removeDirt(int x , int y)
+StudentWorld::~StudentWorld() {
+    vector<Actor*>::iterator i;
+    
+    for (i = m_actor.begin(); i != m_actor.end();)
+    {
+        delete *i;
+        i = m_actor.erase(i);
+    }
+    for (int k = 0; k<64; k++)
+    {
+        for (int l = 0; l<60; l++)
+        {
+            delete m_field[k][l];
+        }
+    }
+    
+    delete m_tunnelman;
+}
+void StudentWorld::cleanUp() {
+    vector<Actor*>::iterator i;
+    for (i = m_actor.begin(); i != m_actor.end();)
+    {
+        delete *i;
+        i = m_actor.erase(i);
+    }
+    for (int k = 0; k<64; k++)
+    {
+        for (int l = 0; l<60; l++)
+        {
+            delete m_field[k][l];
+        }
+    }
+    
+    delete m_tunnelman;
+}
+void StudentWorld::removeDirt(int x, int y)
 {
     
-    for ( int i=x ;i<x+4 ;i++)
+    for (int i = x; i<x + 4; i++)
     {
-        for ( int j=y ;j<y+4 ;j++)
+        for (int j = y; j<y + 4; j++)
         {
-            if ( m_field[i][j] != nullptr)
+            if (m_field[i][j] != nullptr)
             {
                 delete m_field[i][j];
-                m_field[i][j]= nullptr;
+                m_field[i][j] = nullptr;
+                grid[i][j] = 0;
+                playSound(SOUND_DIG);
             }
         }
     }
+}
+void StudentWorld::shootWater(int x, int y)
+{
+    if (m_tunnelman->getAmmo() <= 0)
+    {
+        return;
+    }
+    enum GraphObject::Direction dir = m_tunnelman->getDirection();
+    WaterSquirt *temp;
+    if (dir == 4)
+    {
+        if (x + 1 <= 60 && this->getContentsOf(x + 1, y) == 0)
+        {
+            temp = new WaterSquirt(x+1, y, this, dir);
+            m_actor.push_back(temp);
+        }
+    }
+    else if (dir == 3)
+    {
+        if (x - 1 >= 0 && this->getContentsOf(x - 1, y) == 0)
+        {
+            temp = new WaterSquirt(x - 1, y, this, dir);
+            m_actor.push_back(temp);
+        }
+    }
+    else if (dir == 1)
+    {
+        if (y + 1 <= 60 && this->getContentsOf(x, y + 1) == 0)
+        {
+            temp = new WaterSquirt(x, y+1, this, dir);
+            m_actor.push_back(temp);
+        }
+    }
+    else if (dir == 2)
+    {
+        if (y - 1 >= 0 && this->getContentsOf(x, y - 1) == 0)
+        {
+            temp = new WaterSquirt(x, y - 1, this, dir);
+            m_actor.push_back(temp);
+        }
+    }
+    
+    this->playSound(SOUND_PLAYER_SQUIRT);
+    m_tunnelman->decrementAmmo();
+}
+
+bool StudentWorld:: WithinRadius()
+{
+    return false;
+}
+bool StudentWorld:: touchTunnelMan(int x, int y, int radius)
+{
+    int tunX = m_tunnelman->getX();
+    int tunY = m_tunnelman->getY();
+    return false;
 }

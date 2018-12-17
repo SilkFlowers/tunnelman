@@ -23,14 +23,23 @@ public:
     
     virtual int move();
     
-    virtual void cleanUp()
-    {
-    }
-    
-    bool getContent();
+    virtual void cleanUp();
     
     void textDisplay();
+    
+    int getContentsOf(int x, int y);
+    
+    //void setObject(int x, int y, int ID);
+    
     void removeDirt(int a, int b);
+    
+    void shootWater(int x, int y);
+    
+    bool touchTunnelMan(int x, int y, int radius);
+    
+    
+    bool WithinRadius();
+    ~StudentWorld();
     
 private:
     std::vector<Actor*> m_actor;

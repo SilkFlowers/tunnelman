@@ -27,13 +27,41 @@ public:
     void virtual doSomething() {}
 };
 
-class Boulder : public Actor
+
+
+class WaterPool : public Actor
 {
 public:
+    WaterPool(int x, int y, StudentWorld* world);
+    void doSomething();
+};
+
+class Boulder : public Actor
+{
+private:
+    bool isStable;
+    bool isFalling;
+    bool isWaiting;
+    int tickTime;
+public:
+    void setState(bool stable, bool waiting, bool falling)
+    {
+        isStable = stable;
+        isWaiting = waiting;
+        isFalling = falling;
+    }
+    void virtual dirtBelow();
+    void virtual FallB();
+    bool virtual FallReady();
+    bool virtual Tick30();
+    virtual bool canActorPassThroughMe() {return false;}
     Boulder(int x, int y, StudentWorld* world);
     virtual ~Boulder() {}
-    void virtual doSomething() {}
+    void virtual doSomething();
 };
+
+
+
 
 class TunnelMan : public Actor
 {
@@ -42,8 +70,6 @@ private:
     int m_ammo;
     int m_sonarCharge;
     int m_goldNuggets;
-    
-    
 public:
     TunnelMan(StudentWorld* world);
     virtual ~TunnelMan() {}
@@ -52,21 +78,14 @@ public:
     int getAmmo()const;
     int getSonar()const;
     int getGold()const;
-    
-    
-    
-    
-    void doSomething() const;
-    
-    void shootWater(StudentWorld* world,Direction dir, int x, int y );
-    
+    void decrementAmmo();
 };
-
-class WaterSquirt : public Actor{
+class WaterSquirt : public Actor {
+private:
+    int ticksLeft;
 public:
-    WaterSquirt ( int x, int y , StudentWorld * world, Direction dir);
+    WaterSquirt(int x, int y, StudentWorld * world, Direction dir);
     virtual ~WaterSquirt() {}
-    void virtual doSomething(){}
+    void virtual doSomething();
 };
-
 #endif // ACTOR_H_
