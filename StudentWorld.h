@@ -9,6 +9,7 @@
 #include <sstream>
 #include <iomanip>
 
+const int TID_FREESPACE =10;
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 
 class StudentWorld : public GameWorld

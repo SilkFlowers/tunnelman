@@ -14,9 +14,11 @@ Actor(TID_EARTH,x,y,world,right,.25,3)
 {
     
 }
+//only pick up by tunnel man
+//T = max(100, 300 – 10*current_level_number)
 
 WaterPool::WaterPool(int x, int y, StudentWorld* world):
-Actor(TID_WATER_POOL ,x,y,world,down, 1, 2)
+Actor(TID_WATER_POOL ,x,y,world,right, 1, 2)
 {
     
 }
@@ -26,6 +28,9 @@ void WaterPool:: doSomething()
     {
         return;
     }
+    
+    //if the tunnelman is within 3 radius of water, add water ammo <=3.00
+    //play sound SOUND_GOT_GOODIE if picked up
 }
 
 

@@ -32,6 +32,7 @@ public:
 class WaterPool : public Actor
 {
 public:
+    virtual ~WaterPool(){};
     WaterPool(int x, int y, StudentWorld* world);
     void doSomething();
 };

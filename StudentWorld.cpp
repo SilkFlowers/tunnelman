@@ -14,7 +14,7 @@ int StudentWorld::init()
     {
         for (int j = 0; j<61; j++)
         {
-            grid[i][j] = 0;
+            grid[i][j] = TID_FREESPACE;
         }
     }
     barrels_collected = 0;
@@ -32,7 +32,7 @@ int StudentWorld::init()
             }
             else {
                 m_field[i][j] = new Earth(i, j,this);
-                grid[i][j] = 1;
+                grid[i][j] = TID_EARTH;
             }
         }
     }
