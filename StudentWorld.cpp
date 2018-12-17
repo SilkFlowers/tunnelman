@@ -37,9 +37,11 @@ int StudentWorld::init()
         }
     }
     
+    RegularProtestor * pro = new RegularProtestor( m_tunnelman);
     return GWSTATUS_CONTINUE_GAME;
-
 }
+
+
 // Students:  Add code to this file (if you wish), StudentWorld.h, Actor.h and Actor.cpp
 
 void StudentWorld::textDisplay()
@@ -216,14 +218,53 @@ void StudentWorld::shootWater(int x, int y)
     this->playSound(SOUND_PLAYER_SQUIRT);
     m_tunnelman->decrementAmmo();
 }
+double calcRad(int x1, int y1, int x2, int y2)
+{
+    int x = x1- x2;
+    int y = y1-y2;
+    return sqrt(pow(x, 2) + pow(y, 2));
+}
+
+
 
 bool StudentWorld:: WithinRadius()
 {
     return false;
 }
+
+
+//
+
+
+
+bool StudentWorld::isEarthIndex(int col, int row) const
+{
+    if (row < 0 || row > 59 || (col >= 30 && col <= 33 &&
+                                          row >= 4 && row <= 59))
+        return false;
+    
+    return true;
+}
+//
+
+
+
+bool StudentWorld:: isValidSpotToMove( int x , int y ) const
+{
+    if ( grid[x][y]==10 )
+        return true;
+    
+        return false;
+}
+
+
+
+
+
+
 bool StudentWorld:: touchTunnelMan(int x, int y, int radius)
 {
-    int tunX = m_tunnelman->getX();
-    int tunY = m_tunnelman->getY();
+//    int tunX = m_tunnelman->getX();
+//    int tunY = m_tunnelman->getY();
     return false;
 }

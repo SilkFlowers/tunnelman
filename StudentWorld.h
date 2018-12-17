@@ -33,15 +33,23 @@ public:
     //void setObject(int x, int y, int ID);
     
     void setGridContent(int x, int y, int ID);
+    
+    void initWater ();
+    
     void removeDirt(int a, int b);
     
     void shootWater(int x, int y);
     
     bool touchTunnelMan(int x, int y, int radius);
     
-    
+    double calcRad(int x1, int y1, int x2, int y2);
     bool WithinRadius();
     ~StudentWorld();
+    
+    bool    isValidSpotToMove(int col, int row) const;
+    bool    isWithinRange_Boulder(int col, int row) const;
+    bool    isEarthIndex(int col, int row) const;
+
     
 private:
     std::vector<Actor*> m_actor;
