@@ -32,6 +32,7 @@ public:
     
     //void setObject(int x, int y, int ID);
     
+    void setGridContent(int x, int y, int ID);
     void removeDirt(int a, int b);
     
     void shootWater(int x, int y);

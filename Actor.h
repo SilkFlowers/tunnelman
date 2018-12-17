@@ -27,7 +27,11 @@ public:
     void virtual doSomething() {}
 };
 
-
+class GoldNugget: public Actor
+{
+public:
+    GoldNugget(int x , int y, StudentWorld * world);
+};
 
 class WaterPool : public Actor
 {
@@ -89,4 +93,23 @@ public:
     virtual ~WaterSquirt() {}
     void virtual doSomething();
 };
+
+
+
+
+class RegularProtester : public Actor {
+private:
+    int m_health;
+    bool m_leaveField;
+    int ticksToWaitBetweenMoves;
+public:
+    RegularProtester(int x, int y, StudentWorld* world);
+    virtual ~RegularProtester() {}
+    void virtual doSomething();
+    int numSquaresToMoveInCurrentDirection()const;
+};
+
+
+
+
 #endif // ACTOR_H_

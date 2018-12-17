@@ -14,7 +14,7 @@ int StudentWorld::init()
     {
         for (int j = 0; j<61; j++)
         {
-            grid[i][j] = TID_FREESPACE;
+            grid[i][j] = 10;
         }
     }
     barrels_collected = 0;
@@ -38,6 +38,7 @@ int StudentWorld::init()
     }
     
     return GWSTATUS_CONTINUE_GAME;
+
 }
 // Students:  Add code to this file (if you wish), StudentWorld.h, Actor.h and Actor.cpp
 
@@ -127,6 +128,9 @@ StudentWorld::~StudentWorld() {
     
     delete m_tunnelman;
 }
+
+
+
 void StudentWorld::cleanUp() {
     vector<Actor*>::iterator i;
     for (i = m_actor.begin(); i != m_actor.end();)
@@ -144,6 +148,13 @@ void StudentWorld::cleanUp() {
     
     delete m_tunnelman;
 }
+
+
+void StudentWorld::setGridContent(int x, int y, int ID)
+{
+    grid[x][y] = ID;
+}
+
 void StudentWorld::removeDirt(int x, int y)
 {
     
@@ -155,7 +166,7 @@ void StudentWorld::removeDirt(int x, int y)
             {
                 delete m_field[i][j];
                 m_field[i][j] = nullptr;
-                grid[i][j] = 0;
+                grid[i][j] = 10;
                 playSound(SOUND_DIG);
             }
         }
