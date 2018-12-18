@@ -9,7 +9,6 @@ GameWorld* createStudentWorld(string assetDir)
 int StudentWorld::init()
 {
     ticks_elapsed = 0;
-    barrels_collected = 0;
     for (int i = 0; i<64; i++)
     {
         for (int j = 0; j<61; j++)
@@ -17,7 +16,6 @@ int StudentWorld::init()
             grid[i][j] = 10;
         }
     }
-    barrels_collected = 0;
     m_tunnelman = new TunnelMan(this);
     
     //Initializing Earth
@@ -36,28 +34,53 @@ int StudentWorld::init()
             }
         }
     }
+    //boulders
+    int B = min(int(getLevel() / 2 + 2), 9);
     
-    Regular_Protestor * pro = new Regular_Protestor(60,60, this );
+    //gold nuggets
+    int G = max(int(5 - getLevel() / 2), 2);
+    
+    //barrels of oil
+    int L = min(int(2 + getLevel()), 21);
+    m_barrelsNeeded = L;
+    
+    for (int i = 0; i < B; i++)
+    {
+        int x;
+        int y;
+        makeCoordinate(x, y);
+        for (int j = x; j < x + 4; j++)
+        {
+            for (int k = y; k < y + 4; k++)
+            {
+                if (m_field[j][k] != nullptr)
+                {
+                    delete m_field[j][k];
+                    m_field[j][k] = nullptr;
+                }
+            }
+        }
+        Boulder* boulder = new Boulder(x, y, this);
+        m_actor.push_back(boulder);
+    }
+    
+    for (int i = 0; i < L; i++)
+    {
+        int x;
+        int y;
+        makeCoordinate(x, y);
+        BarrelOfOil* barrel = new BarrelOfOil(x, y, this);
+        m_actor.push_back(barrel);
+    }
+    
+    
+    RegularProtester* pro = new RegularProtester(60, 60, this);
+    m_actor.push_back(pro);
+
+    
     
     return GWSTATUS_CONTINUE_GAME;
 }
-
-TunnelMan * StudentWorld:: getTunnelMan() const
-{
-    return m_tunnelman;
-}
-bool  StudentWorld:: isPlayerCloseBy(int col, int row)
-{
-    if (calcRad(col, row, m_tunnelman->getX(),m_tunnelman->getY()) <= 4)
-        return true;
-    
-    return false;
-}
-
-
-
-
-
 // Students:  Add code to this file (if you wish), StudentWorld.h, Actor.h and Actor.cpp
 
 void StudentWorld::textDisplay()
@@ -89,6 +112,13 @@ int StudentWorld::move()
     // Notice that the return value GWSTATUS_PLAYER_DIED will cause our framework to end the current level.
     ticks_elapsed++;
     StudentWorld::textDisplay();
+    if (m_barrelsNeeded == 0)
+    {
+        advanceToNextLevel();
+        playSound(SOUND_FINISHED_LEVEL);
+        return GWSTATUS_FINISHED_LEVEL;
+    }
+    
     m_tunnelman->doSomething();
     
     if (!m_actor.empty())
@@ -119,6 +149,7 @@ int StudentWorld::move()
     
     if (!m_tunnelman->isAlive())
     {
+        playSound(SOUND_PLAYER_GIVE_UP);
         decLives();
         return GWSTATUS_PLAYER_DIED;
     }
@@ -146,9 +177,6 @@ StudentWorld::~StudentWorld() {
     
     delete m_tunnelman;
 }
-
-
-
 void StudentWorld::cleanUp() {
     vector<Actor*>::iterator i;
     for (i = m_actor.begin(); i != m_actor.end();)
@@ -166,13 +194,10 @@ void StudentWorld::cleanUp() {
     
     delete m_tunnelman;
 }
-
-
 void StudentWorld::setGridContent(int x, int y, int ID)
 {
     grid[x][y] = ID;
 }
-
 void StudentWorld::removeDirt(int x, int y)
 {
     
@@ -200,7 +225,7 @@ void StudentWorld::shootWater(int x, int y)
     WaterSquirt *temp;
     if (dir == 4)
     {
-        if (x + 1 <= 60 && this->getContentsOf(x + 1, y) == 0)
+        if (x + 1 <= 60 && this->getContentsOf(x + 1, y) == 10)
         {
             temp = new WaterSquirt(x+1, y, this, dir);
             m_actor.push_back(temp);
@@ -208,7 +233,7 @@ void StudentWorld::shootWater(int x, int y)
     }
     else if (dir == 3)
     {
-        if (x - 1 >= 0 && this->getContentsOf(x - 1, y) == 0)
+        if (x - 1 >= 0 && this->getContentsOf(x - 1, y) == 10)
         {
             temp = new WaterSquirt(x - 1, y, this, dir);
             m_actor.push_back(temp);
@@ -216,7 +241,7 @@ void StudentWorld::shootWater(int x, int y)
     }
     else if (dir == 1)
     {
-        if (y + 1 <= 60 && this->getContentsOf(x, y + 1) == 0)
+        if (y + 1 <= 60 && this->getContentsOf(x, y + 1) == 10)
         {
             temp = new WaterSquirt(x, y+1, this, dir);
             m_actor.push_back(temp);
@@ -224,7 +249,7 @@ void StudentWorld::shootWater(int x, int y)
     }
     else if (dir == 2)
     {
-        if (y - 1 >= 0 && this->getContentsOf(x, y - 1) == 0)
+        if (y - 1 >= 0 && this->getContentsOf(x, y - 1) == 10)
         {
             temp = new WaterSquirt(x, y - 1, this, dir);
             m_actor.push_back(temp);
@@ -234,50 +259,220 @@ void StudentWorld::shootWater(int x, int y)
     this->playSound(SOUND_PLAYER_SQUIRT);
     m_tunnelman->decrementAmmo();
 }
-double StudentWorld :: calcRad(int x1, int y1, int x2, int y2)
+TunnelMan* StudentWorld::getTunnelMan()const
 {
-    int x = x1- x2;
-    int y = y1-y2;
-    return sqrt(pow(x, 2) + pow(y, 2));
+    return m_tunnelman;
+}
+
+int StudentWorld::RandInt(int lower, int upper)
+{
+    int result = rand() % (upper - lower + 1) + lower;
+    return result;
 }
 
 
-
-bool StudentWorld:: WithinRadius()
+int StudentWorld::getRestTicks()
 {
+    int level = getLevel();
+    return max(0, 3 - level/4);
+}
+
+std::vector<Protester*> StudentWorld::getProtestorVec()
+{
+    return m_protestorVec;
+}
+void StudentWorld::decrementBarrelsNeeded()
+{
+    if (m_barrelsNeeded > 0)
+    {
+        m_barrelsNeeded--;
+    }
+}
+int StudentWorld::getRandomNum(int max)const
+{
+    return int(rand() % max);
+}
+void StudentWorld::makeCoordinate(int &x, int&y)
+{
+    int actorX;
+    int actorY;
+    double xSide;
+    double ySide;
+    double radius;
+    bool done = false;
+    
+    while (!done)
+    {
+        x = getRandomNum(59) + 1;
+        y = getRandomNum(59) + 1;
+        if (m_actor.size() == 0)
+        {
+            done = true;
+        }
+        for (size_t i = 0; i < m_actor.size(); i++)
+        {
+            actorX = m_actor[i]->getX();
+            actorY = m_actor[i]->getY();
+            xSide = x - actorX;
+            ySide = y - actorY;
+            radius = sqrt(pow(xSide, 2.0) + pow(ySide, 2.0));
+            if (radius <= 4.0)
+            {
+                done = false;
+                break;
+            }
+            done = true;
+        }
+    }
+}
+int StudentWorld::ticksBetweenProtestors()
+{
+    int level = getLevel();
+    return max(25, 200 - level);
+}
+
+bool StudentWorld::isBoulder(int x, int y)const
+{
+    int boulderX;
+    int boulderY;
+    double xSide;
+    double ySide;
+    double radius=4;
+    for (size_t i = 0; i < m_actor.size(); i++)
+    {
+        if (m_actor[i]->getID() == TID_BOULDER)
+        {
+            
+            boulderX = m_actor[i]->getX();
+            boulderY = m_actor[i]->getY();
+            xSide = x - boulderX;
+            ySide = y - boulderY;
+            radius = sqrt(pow(xSide, 2.0) + pow(ySide, 2.0));
+            
+            if (radius <= 3)
+            {
+                return true;
+            }
+        }
+    }
     return false;
 }
-
-
-
-
-bool StudentWorld::isEarthIndex(int col, int row) const
+bool StudentWorld:: isTunnelAround(int x1, int y1)
 {
-    if (row < 0 || row > 59 || (col >= 30 && col <= 33 &&
-                                          row >= 4 && row <= 59))
-        return false;
-    
-    return true;
-}
-
-bool StudentWorld:: isValidSpotToMove( int x , int y ) const
-{
-    
-    
-    if ( grid[x][y]==TID_PROTESTER ||  grid[x][y]==TID_BOULDER ||  grid[x][y]==TID_HARD_CORE_PROTESTER  )
-        return false;
-    
+    int x2 = m_tunnelman->getX();
+    int y2 = m_tunnelman->getY();
+    int distance = sqrt(pow((x1 - x2), 2) + pow((y1-y2), 2));
+    if (distance <= 4)
         return true;
-}
-
-
-
-
-
-
-bool StudentWorld:: touchTunnelMan(int x, int y, int radius)
-{
-//    int tunX = m_tunnelman->getX();
-//    int tunY = m_tunnelman->getY();
     return false;
 }
+
+int StudentWorld:: canSeeTunnel(int x, int y)
+{
+    for (int i = 0; x - i >= 0; i++)
+    {
+        if (getContentsOf(x - i, y)!= TID_EARTH )
+        {
+            if (x - i == m_tunnelman->getX() && y == m_tunnelman->getY())
+                return 1;  //left
+        }
+        else
+            break;
+    }
+    for (int i = 0; x + i <= 63; i++)
+    {
+        if (getContentsOf(x + i, y)!= TID_EARTH )
+        {
+            if (x + i == m_tunnelman->getX() && y == m_tunnelman->getY())
+                return 2; //right
+        }
+        else
+            break;
+    }
+    for (int i = 0; y + i <= 60; i++)
+    {
+        if (getContentsOf(x , y+i)!= TID_EARTH )
+        {
+            if (x == m_tunnelman->getX() && y + i == m_tunnelman->getY())
+                return 3; //up
+        }
+        else
+            break;
+    }
+    for (int i = 0; y - i >= 0; i++)
+    {
+        if (getContentsOf(x , y-i)!= TID_EARTH )
+        {
+            if (x == m_tunnelman->getX() && y - i == m_tunnelman->getY())
+                return 4; //down
+        }
+        else
+            break;
+    }
+    return 0;
+}
+/*std::queue<int> StudentWorld::computeShortestPath(int startX, int startY, int endX, int endY)
+ {
+ std::queue<int> listOfDirections;
+ int visitedGrid[61][61];
+ for (int i = 0; i < 61; i++)
+ {
+ for (int j = 0; j < 61; j++)
+ {
+ visitedGrid[i][j] = grid[i][j];
+ }
+ }
+ //4:right,3:left,2:down,1:up,0:none
+ struct node
+ {
+ node(int X, int Y)
+ {
+ x = X;
+ y = Y;
+ found = false;
+ }
+ int dir;
+ int x;
+ int y;
+ bool found;
+ node* up;
+ node* down;
+ node* left;
+ node* right;
+ };
+ node* root = new node(startX,startY);
+ bool done = false;
+ node* current = root;
+ while (!done)
+ {
+ if (current->x == endX && current->y == endY)
+ {
+ done = true;
+ }
+ else if (visitedGrid[current->x][current->y + 1]==0 && current->y+1<=60)
+ {
+ current->up = new node(current->x, current->y + 1);
+ current->dir = 1;
+ visitedGrid[current->x][current->y + 1] = 1;
+ }
+ else if (visitedGrid[current->x][current->y - 1] == 0 && current->y - 1>=0)
+ {
+ current->down = new node(current->x, current->y - 1);
+ current->dir = 2;
+ visitedGrid[current->x][current->y - 1] = 1;
+ }
+ else if (visitedGrid[current->x-1][current->y] == 0 && current->y - 1>=0)
+ {
+ current->left = new node(current->x-1, current->y);
+ current->dir = 3;
+ visitedGrid[current->x - 1][current->y] = 1;
+ }
+ else if (visitedGrid[current->x+1][current->y] == 0 && current->x + 1<=60)
+ {
+ current->right = new node(current->x+1, current->y);
+ current->dir = 4;
+ visitedGrid[current->x + 1][current->y] = 1;
+ }
+ }
+ 
+ }*/

@@ -4,16 +4,15 @@
 #include "GameWorld.h"
 #include "GameConstants.h"
 #include "Actor.h"
+#include <queue>
 #include <string>
 #include <vector>
+#include <cmath>
 #include <sstream>
 #include <iomanip>
 
-const int TID_FREESPACE =10;
-
-typedef std::vector<Protester*> ProtesterContainer;
-
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
+const int TID_FREESPACE = 10;
 
 class StudentWorld : public GameWorld
 {
@@ -33,42 +32,47 @@ public:
     
     int getContentsOf(int x, int y);
     
-    //void setObject(int x, int y, int ID);
-    
     void setGridContent(int x, int y, int ID);
-    
-    void initWater ();
     
     void removeDirt(int a, int b);
     
     void shootWater(int x, int y);
     
-    bool touchTunnelMan(int x, int y, int radius);
+    TunnelMan* getTunnelMan()const;
     
-    double calcRad(int x1, int y1, int x2, int y2);
-    bool WithinRadius();
+    std::vector<Protester*> getProtestorVec();
+    
+    int RandInt(int lower, int upper);
+ 
+    void decrementBarrelsNeeded();
+    
+    int getRandomNum(int max)const;
+    int ticksBetweenProtestors();
+
+    
+    int getRestTicks();
+    
+    void makeCoordinate(int &x, int&y);
+    
+    bool isBoulder(int x, int y)const;
+    
+    //std::queue<int> computeShortestPath(int startX, int startY, int endX, int endY);
+    
     ~StudentWorld();
     
+    bool isTunnelAround(int x1, int y1);
     
-    void init_Protesters();
-    
-    TunnelMan * getTunnelMan() const;
+    int canSeeTunnel(int x, int y);
     
     
-    bool    isPlayerCloseBy(int col, int row) ;
-
-    
-    bool    isValidSpotToMove(int col, int row) const;
-    bool    isWithinRange_Boulder(int col, int row) const;
-    bool    isEarthIndex(int col, int row) const;
-
     
 private:
     std::vector<Actor*> m_actor;
+    std::vector<Protester*> m_protestorVec;
     TunnelMan* m_tunnelman;
     Earth* m_field[64][64];
     int grid[64][64];
-    int barrels_collected;
+    int m_barrelsNeeded;
     int ticks_elapsed;
 };
 
