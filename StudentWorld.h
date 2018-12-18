@@ -10,6 +10,9 @@
 #include <iomanip>
 
 const int TID_FREESPACE =10;
+
+typedef std::vector<Protester*> ProtesterContainer;
+
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
 
 class StudentWorld : public GameWorld
@@ -45,6 +48,15 @@ public:
     double calcRad(int x1, int y1, int x2, int y2);
     bool WithinRadius();
     ~StudentWorld();
+    
+    
+    void init_Protesters();
+    
+    TunnelMan * getTunnelMan() const;
+    
+    
+    bool    isPlayerCloseBy(int col, int row) ;
+
     
     bool    isValidSpotToMove(int col, int row) const;
     bool    isWithinRange_Boulder(int col, int row) const;

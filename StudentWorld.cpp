@@ -37,9 +37,25 @@ int StudentWorld::init()
         }
     }
     
-    RegularProtestor * pro = new RegularProtestor( m_tunnelman);
+    Regular_Protestor * pro = new Regular_Protestor(60,60, this );
+    
     return GWSTATUS_CONTINUE_GAME;
 }
+
+TunnelMan * StudentWorld:: getTunnelMan() const
+{
+    return m_tunnelman;
+}
+bool  StudentWorld:: isPlayerCloseBy(int col, int row)
+{
+    if (calcRad(col, row, m_tunnelman->getX(),m_tunnelman->getY()) <= 4)
+        return true;
+    
+    return false;
+}
+
+
+
 
 
 // Students:  Add code to this file (if you wish), StudentWorld.h, Actor.h and Actor.cpp
@@ -218,7 +234,7 @@ void StudentWorld::shootWater(int x, int y)
     this->playSound(SOUND_PLAYER_SQUIRT);
     m_tunnelman->decrementAmmo();
 }
-double calcRad(int x1, int y1, int x2, int y2)
+double StudentWorld :: calcRad(int x1, int y1, int x2, int y2)
 {
     int x = x1- x2;
     int y = y1-y2;
@@ -233,8 +249,6 @@ bool StudentWorld:: WithinRadius()
 }
 
 
-//
-
 
 
 bool StudentWorld::isEarthIndex(int col, int row) const
@@ -245,16 +259,15 @@ bool StudentWorld::isEarthIndex(int col, int row) const
     
     return true;
 }
-//
-
-
 
 bool StudentWorld:: isValidSpotToMove( int x , int y ) const
 {
-    if ( grid[x][y]==10 )
-        return true;
     
+    
+    if ( grid[x][y]==TID_PROTESTER ||  grid[x][y]==TID_BOULDER ||  grid[x][y]==TID_HARD_CORE_PROTESTER  )
         return false;
+    
+        return true;
 }
 
 

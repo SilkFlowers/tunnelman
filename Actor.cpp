@@ -1,3 +1,5 @@
+
+
 #include "Actor.h"
 #include "StudentWorld.h"
 
@@ -31,14 +33,49 @@ void WaterPool:: doSomething()
     //play sound SOUND_GOT_GOODIE if picked up
 }
 
-
 GoldNugget ::GoldNugget(int x, int y, StudentWorld *world):
-Actor(TID_GOLD ,x,y,world,right, 1, 2)
+Actor(TID_GOLD ,x,y,world,right, 1, 2), GoldPick(false)
 {
-    
+    setVisible(false);
 }
 
-
+void GoldNugget :: doSomething()
+{
+    if ( !isAlive())
+    {
+        return;
+    }
+    //if tunnelman is close by consume
+    if (getWorld()-> calcRad(getX(),getY(),getWorld()->getTunnelMan()->getX(), getWorld()->getTunnelMan()->getY() )<=3.00)
+    {
+        setDead();
+        getWorld()-> playSound(SOUND_GOT_GOODIE);
+        getWorld()->getTunnelMan()->incGold();
+    }
+    
+    //if tunnelman is close by make visible
+    if (getWorld()-> calcRad(getX(),getY(),getWorld()->getTunnelMan()->getX(), getWorld()->getTunnelMan()->getY() )<=4.00)
+    {
+        setVisible(true);
+        return;
+    }
+    
+    
+    //need getProtestor func
+    if (getWorld()-> calcRad(getX(),getY(),getWorld()->getProtestor()->getX(), getWorld()->getProtestor()->getY() )<=3.00)
+    {
+        GoldPick = true;
+        setDead();
+        getWorld()->playSound( SOUND_PROTESTER_FOUND_GOLD);
+        getWorld()->increaseScore(25);
+        //take nearest path back to top right, bribed, leave the oil field
+    }
+    
+    
+    
+    
+    
+}
 
 Boulder::Boulder(int x, int y, StudentWorld* world):
 Actor(TID_BOULDER,x,y,world,down,1.0,1)
@@ -204,6 +241,7 @@ void TunnelMan::doSomething()
             case KEY_PRESS_RIGHT:
                 if (getX() <60 && getDirection() == right)
                 {
+                    
                     moveTo(getX() + 1, getY());
                     getWorld()->setGridContent(getX(), getY(), 10);
                     getWorld()->setGridContent(getX()+1, getY(), TID_PLAYER);
@@ -480,12 +518,12 @@ void Protester::doSomething(TunnelMan * player)
         decreTicksSincePerpenMoves();
     }
     
-//    if (Game->isPlayerCloseBy(getX(), getY()) && !leaveOilFieldState() && getShoutingInterval() == 0)
-//    {
-//        Game->playSound(SOUND_PROTESTER_YELL);
-//        player->decreHitpts(20);
-//        setShoutingInterval(15);
-//    }
+    if (Game->isPlayerCloseBy(getX(), getY()) && !leaveOilFieldState() && getShoutingInterval() == 0)
+    {
+   //     Game->playSound(SOUND_PROTESTER_YELL);
+        //player->decreHitpts(20);
+  //      setShoutingInterval(15);
+    }
     
     if (canSeePlayer(getX(), getY(), player))            //    If a player is in horizontal or vertical sight without objects in between
     {
@@ -766,25 +804,19 @@ bool Protester::canSeePlayer(int col, int row, TunnelMan * player)
                     return false;
                 i++;
             }
-            
             setDirection(left);
             moveTo(getX()-1, getY());
-            
             return true;
-            
         }
     }
-    
     return false;
 }
 
-
-
 //
-RegularProtestor::RegularProtestor(TunnelMan * player) :
-Protester(TID_PROTESTER, 60, 60,getWorld(), left, 1.0, 0)
+RegularProtestor::RegularProtestor(int x, int y, StudentWorld *world) :
+Protester(TID_PROTESTER, 60, 60,world, left, 1.0, 0)
 {
-    int currLevel = player->getWorld()->getLevel();
+    int currLevel =  getWorld()->getLevel();
     int T = std::max(0, static_cast<int>(3 - currLevel / 4));
     int N = rand() % 53 + 8;
     

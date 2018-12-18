@@ -25,7 +25,6 @@ public:
 
 
 
-
 class Earth: public Actor
 {
 public:
@@ -33,11 +32,23 @@ public:
     virtual ~Earth() {}
     void virtual doSomething() {}
 };
+
+
+
+
+//GoldPick , GoldDrop
+
 class GoldNugget: public Actor
 {
+private:
+    bool GoldPick;
 public:
     GoldNugget(int x , int y, StudentWorld * world);
+    void virtual doSomething();
 };
+
+
+
 
 class WaterPool : public Actor
 {
@@ -90,6 +101,7 @@ public:
     int getSonar()const;
     int getGold()const;
     void decrementAmmo();
+    void incGold(){m_goldNuggets += 10;}
 };
 class WaterSquirt : public Actor {
 private:
@@ -184,15 +196,19 @@ public:
 };
 
 
-class RegularProtestor : Protester
+class Regular_Protestor : Protester
 {
 public:
     void doSomething();
-    RegularProtestor(TunnelMan * player);
-
-
+    Regular_Protestor(int x, int y, StudentWorld *world);
     void numSquaresToMoveInCurrentDirection() const;
 
 };
+
+class Hardcore_Protester: Regular_Protestor
+{
+    
+};
+
 
 #endif // ACTOR_H_
